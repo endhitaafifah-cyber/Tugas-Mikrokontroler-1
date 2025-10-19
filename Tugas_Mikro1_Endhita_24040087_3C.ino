@@ -17,6 +17,10 @@ unsigned long previousMillis2 = 0; // untuk LED2
 const long interval1 = 500;        // interval blink LED1
 const long interval2 = 300;        // interval blink LED2
 
+// Timer untuk update Serial Monitor tiap 1 detik
+unsigned long previousPrintMillis = 0;
+const long printInterval = 1000;
+
 void setup() {
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
@@ -27,6 +31,8 @@ void setup() {
   pinMode(button2, INPUT_PULLUP);
 
   Serial.begin(9600);
+  Serial.println("=== Program LED dan Potensiometer Aktif ===");
+  Serial.println("===========================================");
 }
 
 void loop() {
@@ -73,4 +79,27 @@ void loop() {
   int potValue = analogRead(potPin);
   int brightness = map(potValue, 0, 1023, 0, 255);
   analogWrite(led4, brightness);
+
+  // === Kirim status ke Serial Monitor tiap 1 detik ===
+  if (currentMillis - previousPrintMillis >= printInterval) {
+    previousPrintMillis = currentMillis;
+
+    Serial.println("====================================");
+    Serial.print("LED1 : ");
+    Serial.println(led1State ? "Blinking" : "Off");
+
+    Serial.print("LED2 : ");
+    if (led2Blinking) Serial.println("Blink Aktif");
+    else Serial.println("Mati / Tidak Blink");
+
+    Serial.print("LED3 : ");
+    Serial.println(led3State ? "Nyala" : "Mati");
+
+    Serial.print("LED4 : Kecerahan = ");
+    Serial.println(brightness);
+
+    Serial.print("Nilai Potensiometer = ");
+    Serial.println(potValue);
+    Serial.println("====================================\n");
+  }
 }
